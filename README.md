@@ -105,9 +105,7 @@ entrega corresponde a los servicios existentes y ya validados.
 
 ## Relación con los microservicios existentes
 
-El arquetipo extrae y formaliza convenciones del código del foro. Los servicios
-ya existían antes de construir esta plantilla; no se afirma que fueron generados
-históricamente con ella ni se reemplazan sus implementaciones validadas.
+El arquetipo extrae y formaliza convenciones del codigo del foro. Los servicios existian antes de construir esta plantilla. La adopcion actual genera bases nuevas con Maven y migra el dominio versionado mediante scripts/Adoptar-Servicios.ps1; no atribuye generacion historica a Semana 2. Cada servicio incorpora ARQUETIPO.md, propiedades de procedencia en su POM y .arquetipo/origen.json.
 
 | Convención del arquetipo | Usuarios | Contenido | Moderación |
 |---|---|---|---|
@@ -161,3 +159,21 @@ no se atribuyen a una conexión Oracle real del ejemplo generado.
 Referencias oficiales: [crear arquetipos](https://maven.apache.org/guides/mini/guide-creating-archetypes.html),
 [probar arquetipos](https://maven.apache.org/guides/mini/guide-testing-archetypes.html)
 y [empaquetar archivos como .gitignore](https://maven.apache.org/archetype/maven-archetype-plugin/faq.html).
+
+## Generar los tres servicios reales conservando su dominio
+
+Requisitos: JDK 17, Git, arquetipo instalado con mvnw.cmd install y los repositorios clonados en la estructura indicada por foro-despliegue. Los tres repositorios fuente deben tener todos sus cambios confirmados. El destino debe ser una carpeta nueva fuera de las fuentes. El proceso no modifica los repositorios ni despliega contenedores.
+
+```powershell
+.\scripts\Adoptar-Servicios.ps1 -SourceRoot 'C:\ForoNexo' -OutputRoot 'C:\ForoNexo\SEMANA 5\.verification\adopcion-nueva'
+```
+
+Adapta las rutas a tu equipo y, si es necesario, indica -JavaHome. Se generan foro-usuarios, foro-contenido y foro-moderacion mediante el plugin oficial de Maven. Se conservan el POM base y el wrapper; se sustituye el ejemplo Recurso por el dominio importado desde archivos Git permitidos. Usuarios agrega las dependencias JWT de su implementacion. No se copian repositorios Git, target, wallet ni secretos.
+
+La procedencia registra el commit importado y SHA256 por archivo. Las pruebas comparan el inventario fuente de forma independiente, detectan omisiones deliberadas y verifican que se rechacen destinos existentes/anidados y fuentes con cambios pendientes. Para ejecutar la comprobacion completa (crea tres proyectos, no arranca servicios):
+
+```powershell
+.\tests\Test-AdoptarServicios.ps1 -SourceRoot 'C:\ForoNexo' -OutputRoot 'C:\ForoNexo\SEMANA 5\.verification\adopcion-prueba'
+```
+
+Despues, ejecuta mvnw.cmd verify en cada proyecto generado. La adopcion se verifico con 85 pruebas de Usuarios, 148 de Contenido y 26 de Moderacion, todas aprobadas. Las fuentes Java, recursos, SQL y pruebas de dominio se conservaron por hash. La evidencia del proceso no sustituye la evaluacion del profesor ni afirma que la version inicial de Semana 2 naciera de esta plantilla.
