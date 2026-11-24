@@ -1,0 +1,10 @@
+/target/
+/.verification/
+/.idea/
+*.iml
+*.log
+.env
+Wallet*/
+*.jks
+*.p12
+*.sso
